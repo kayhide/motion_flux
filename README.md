@@ -1,4 +1,4 @@
-# MotionFlux
+# MotionFlux [![Build Status](https://travis-ci.org/kayhide/motion_flux.svg?branch=master)](https://travis-ci.org/kayhide/motion_flux) [![Dependency Status](https://gemnasium.com/kayhide/motion_flux.svg)](https://gemnasium.com/kayhide/motion_flux)
 
 MotionFlux is a RubyMotion gem to build apps based on Flux architecture.
 
