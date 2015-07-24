@@ -7,6 +7,10 @@ AllCops:
     - 'db/**/*'
     - 'config/**/*'
 
+# Configuration parameters: CountComments.
+Metrics/MethodLength:
+  Max: 20
+
 # Configuration parameters: EnforcedStyle, SupportedStyles, ProceduralMethods, FunctionalMethods, IgnoredMethods.
 Style/BlockDelimiters:
   Exclude:
