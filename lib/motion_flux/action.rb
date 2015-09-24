@@ -12,7 +12,15 @@ module MotionFlux
     end
 
     def dispatch
-      MotionFlux::Dispatcher.dispatch self
+      Dispatcher.dispatch self
     end
+
+    module ClassMethods
+      def dispatch message, *args
+        new(message, *args).dispatch
+      end
+    end
+
+    extend ClassMethods
   end
 end
