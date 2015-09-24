@@ -5,11 +5,49 @@ describe MotionFlux::Store do
 
   class SomeStore < MotionFlux::Store; end
 
+  before do
+    SomeStore.class_eval do
+      @attributes = nil
+      @instance = nil
+    end
+  end
+
   describe '.subscribe' do
     it 'calls MotionFlex::Dispatcher.register' do
       expect(MotionFlux::Dispatcher)
         .to receive(:register).with(SomeStore.instance, SomeAction)
       SomeStore.subscribe SomeAction
+    end
+  end
+
+  describe '.store_attribute' do
+    it 'adds attr reader' do
+      SomeStore.store_attribute :city
+
+      SomeStore.instance.instance_eval do
+        @city = 'Tokyo'
+      end
+      expect(SomeStore.city).to eq 'Tokyo'
+    end
+
+    it 'works with many attrs' do
+      SomeStore.store_attribute :city, :weather, :temperature
+
+      SomeStore.instance.instance_eval do
+        @city = 'Tokyo'
+        @weather = 'Sunny'
+        @temperature = '25C'
+      end
+      expect(SomeStore.city).to eq 'Tokyo'
+      expect(SomeStore.weather).to eq 'Sunny'
+      expect(SomeStore.temperature).to eq '25C'
+    end
+  end
+
+  describe '.attributes' do
+    it 'returns attributes' do
+      SomeStore.store_attribute :city, :weather, :temperature
+      expect(SomeStore.attributes).to eq %i(city weather temperature)
     end
   end
 

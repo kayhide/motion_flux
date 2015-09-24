@@ -9,6 +9,21 @@ module MotionFlux
         MotionFlux::Dispatcher.register instance, action
       end
 
+      def store_attribute *attrs
+        attrs.each do |attr|
+          attributes << attr
+
+          attr_reader attr
+          define_singleton_method attr do
+            instance.send attr
+          end
+        end
+      end
+
+      def attributes
+        @attributes ||= []
+      end
+
       def instance
         @instance ||= new
       end
