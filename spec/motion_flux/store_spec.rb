@@ -53,6 +53,11 @@ describe MotionFlux::Store do
       expect(SomeStore.weather).to eq 'Sunny'
       expect(SomeStore.temperature).to eq '25C'
     end
+
+    it 'takes default option' do
+      SomeStore.store_attribute :city, default: 'Sapporo'
+      expect(SomeStore.city).to eq 'Sapporo'
+    end
   end
 
   describe '.attributes' do

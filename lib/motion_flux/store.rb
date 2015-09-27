@@ -14,12 +14,17 @@ module MotionFlux
       end
 
       def store_attribute *attrs
+        options = attrs.extract_options!
         attrs.each do |attr|
           attributes << attr
 
           attr_reader attr
           define_singleton_method attr do
             instance.send attr
+          end
+
+          if options[:default]
+            instance.instance_variable_set "@#{attr}", options[:default]
           end
         end
       end
