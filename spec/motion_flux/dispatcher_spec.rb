@@ -6,7 +6,7 @@ describe MotionFlux::Dispatcher do
 
   describe '.dispatch' do
     before do
-      @store = double
+      @store = double 'store'
       MotionFlux::Dispatcher.register @store, SomeAction
     end
 
@@ -28,6 +28,33 @@ describe MotionFlux::Dispatcher do
     it 'skips if action is not registered' do
       expect(@store).not_to receive(:something)
       MotionFlux::Dispatcher.dispatch AnotherAction.new(:something)
+    end
+
+    describe 'with dependency' do
+      before do
+        @first, @second = [double('first'), double('second')].each do |store|
+          MotionFlux::Dispatcher.register store, SomeAction
+        end
+        @last = @store
+        MotionFlux::Dispatcher.add_dependency @last, @second
+        MotionFlux::Dispatcher.add_dependency @second, @first
+      end
+
+      it 'calls store method in order of dependencies' do
+        stores = []
+        [@last, @first, @second].each do |s|
+          expect(s).to receive(:something) { stores << s }
+        end
+        MotionFlux::Dispatcher.dispatch SomeAction.new(:something)
+        expect(stores).to eq [@first, @second, @last]
+      end
+
+      it 'fails when cyclic dependency detected' do
+        MotionFlux::Dispatcher.add_dependency @first, @last
+        expect {
+          MotionFlux::Dispatcher.dispatch SomeAction.new(:something)
+        }.to raise_error(TSort::Cyclic)
+      end
     end
   end
 

@@ -1,3 +1,5 @@
+require 'motion_flux/dependency_graph'
+
 module MotionFlux
   module Dispatcher
     module_function
@@ -6,18 +8,28 @@ module MotionFlux
       @subscribers ||= Hash.new { |hash, key| hash[key] = [] }
     end
 
+    def dependencies
+      @dependencies ||= DependencyGraph.new
+    end
+
     def register store, action
-      puts "#{store} is registered on #{action}"
       subscribers[action] << store
+    end
+
+    def add_dependency store, depended_stores
+      @order = nil
+      dependencies[store] ||= []
+      dependencies[store].concat Array.wrap(depended_stores)
     end
 
     def clear
       subscribers.clear
+      dependencies.clear
     end
 
     def dispatch action
       exclusive_run action do
-        subscribers[action.class].each do |store|
+        ordered_subscribers(action).each do |store|
           if store.respond_to? action.message
             store.send action.message, action
           else
@@ -25,6 +37,11 @@ module MotionFlux
           end
         end
       end
+    end
+
+    def ordered_subscribers action
+      @order ||= dependencies.tsort.each_with_index.to_h
+      subscribers[action.class].sort_by { |x| @order[x] || @order.length }
     end
 
     def exclusive_run action, &proc
