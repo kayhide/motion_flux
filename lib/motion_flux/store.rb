@@ -9,6 +9,10 @@ module MotionFlux
         MotionFlux::Dispatcher.register instance, action
       end
 
+      def wait_for *stores
+        MotionFlux::Dispatcher.add_dependency instance, stores.map(&:instance)
+      end
+
       def store_attribute *attrs
         attrs.each do |attr|
           attributes << attr

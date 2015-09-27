@@ -2,7 +2,6 @@ require 'spec_helper'
 
 describe MotionFlux::Store do
   class SomeAction < MotionFlux::Action; end
-
   class SomeStore < MotionFlux::Store; end
 
   before do
@@ -17,6 +16,18 @@ describe MotionFlux::Store do
       expect(MotionFlux::Dispatcher)
         .to receive(:register).with(SomeStore.instance, SomeAction)
       SomeStore.subscribe SomeAction
+    end
+  end
+
+  describe '.wait_for' do
+    class FirstStore < MotionFlux::Store; end
+    class SecondStore < MotionFlux::Store; end
+
+    it 'calls MotionFlex::Dispatcher.add_dependency' do
+      stores = [FirstStore.instance, SecondStore.instance]
+      expect(MotionFlux::Dispatcher)
+        .to receive(:add_dependency).with(SomeStore.instance, stores)
+      SomeStore.wait_for FirstStore, SecondStore
     end
   end
 
